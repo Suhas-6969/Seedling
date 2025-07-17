@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 import requests
-import os
+
 import json
+import re
 
 app = FastAPI()
 
@@ -25,13 +26,11 @@ Body: {body}
 Comments: {comments}
 '''
 
-# Hugging Face Inference API endpoint for text generation
-HF_API_URL = "https://api-inference.huggingface.co/models/bigscience/bloomz-7b1"
-# Hugging Face token for authentication
+
 
 
 def call_gemini_llm(prompt):
-    GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent"
+    GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
     GEMINI_API_KEY = "AIzaSyCVKxRvA7Jv2zlMkUgaixaA4gzfRR0lUjA"
     headers = {
         "Content-Type": "application/json",
@@ -84,9 +83,25 @@ async def analyze_issue(data: IssueRequest):
 
     # Call Google Gemini LLM
     try:
+        # llm_output = call_gemini_llm(prompt)
+        # # Try to parse the output as JSON
+        # analysis = json.loads(llm_output)
         llm_output = call_gemini_llm(prompt)
-        # Try to parse the output as JSON
-        analysis = json.loads(llm_output)
+        print("LLM RAW OUTPUT:\n", llm_output)  # Add this
+        # analysis = json.loads(llm_output)
+        
+
+    # Try to extract first JSON object from Gemini output
+        try:
+            match = re.search(r"\{.*\}", llm_output, re.DOTALL)
+            if match:
+                json_text = match.group(0)
+                analysis = json.loads(json_text)
+            else:
+                raise Exception("No JSON object found in LLM output.")
+        except json.JSONDecodeError as e:
+            raise Exception(f"Failed to decode JSON: {e}\nRaw Output:\n{llm_output}")
+                
         return analysis
     except Exception as e:
         return {"error": f"LLM error: {e}"} 
