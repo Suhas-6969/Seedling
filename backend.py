@@ -81,27 +81,15 @@ async def analyze_issue(data: IssueRequest):
     comments_text = "\n".join([c.get("body", "") for c in comments])
     prompt = LLM_PROMPT.format(title=title, body=body, comments=comments_text)
 
-    # Call Google Gemini LLM
     try:
-        # llm_output = call_gemini_llm(prompt)
-        # # Try to parse the output as JSON
-        # analysis = json.loads(llm_output)
         llm_output = call_gemini_llm(prompt)
-        print("LLM RAW OUTPUT:\n", llm_output)  # Add this
-        # analysis = json.loads(llm_output)
-        
-
-    # Try to extract first JSON object from Gemini output
-        try:
-            match = re.search(r"\{.*\}", llm_output, re.DOTALL)
-            if match:
-                json_text = match.group(0)
-                analysis = json.loads(json_text)
-            else:
-                raise Exception("No JSON object found in LLM output.")
-        except json.JSONDecodeError as e:
-            raise Exception(f"Failed to decode JSON: {e}\nRaw Output:\n{llm_output}")
-                
+        print("LLM RAW OUTPUT:\n", llm_output)
+        match = re.search(r"\{.*\}", llm_output, re.DOTALL)
+        if match:
+            json_text = match.group(0)
+            analysis = json.loads(json_text)
+        else:
+            raise Exception("No JSON object found in LLM output.")
         return analysis
     except Exception as e:
-        return {"error": f"LLM error: {e}"} 
+        return {"error": f"LLM error: {e}"}
