@@ -24,4 +24,24 @@ An AI-powered web application that analyzes GitHub issues using **Google Gemini 
 
 ---
 
-## 📂 Project Structure
+---
+
+## ⚡ Complete Setup & Run (All in One)
+
+Copy and run these commands in your terminal:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/<your-username>/Seedling.git && cd Seedling
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Create .env file with your API key
+echo "GEMINI_API_KEY=your_google_gemini_api_key" > .env
+
+# 4. Start backend (FastAPI) in background
+uvicorn backend:app --reload &
+
+# 5. Start frontend (Streamlit)
+streamlit run frontend.py
