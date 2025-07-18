@@ -38,7 +38,7 @@ git clone https://github.com/<your-username>/Seedling.git && cd Seedling
 pip install -r requirements.txt
 
 # 3. Create .env file with your API key
-echo "GEMINI_API_KEY=your_google_gemini_api_key" > .env
+"Set your API key directly in backend.py in the variable api_key = 'your_key_here'."
 
 # 4. Start backend (FastAPI) in background
 uvicorn backend:app --reload &
